@@ -142,8 +142,17 @@ function makeImmutable(obj) {
  *    makeWord({ a: [0, 1], b: [2, 3], c: [4, 5] }) => 'aabbcc'
  *    makeWord({ H:[0], e: [1], l: [2, 3, 8], o: [4, 6], W:[5], r:[7], d:[9]}) => 'HelloWorld'
  */
-function makeWord(/* lettersObject */) {
-  throw new Error('Not implemented');
+function makeWord(lettersObject) {
+  const resArr = [];
+  const keys = Object.keys(lettersObject);
+  for (let i = 0; i < keys.length; i += 1) {
+    const key = keys[i];
+    for (let j = 0; j < lettersObject[key].length; j += 1) {
+      const index = lettersObject[key][j];
+      resArr[index] = key;
+    }
+  }
+  return resArr.join('');
 }
 
 /**
@@ -160,8 +169,43 @@ function makeWord(/* lettersObject */) {
  *    sellTickets([25, 25, 50]) => true
  *    sellTickets([25, 100]) => false (The seller does not have enough money to give change.)
  */
-function sellTickets(/* queue */) {
-  throw new Error('Not implemented');
+
+function sellTickets(queue) {
+  const seller = {
+    kassa: {
+      25: 0,
+      50: 0,
+      100: 0,
+    },
+
+    sell(money) {
+      if (money === 25) {
+        this.kassa[25] += 1;
+      } else if (money === 50 && this.kassa[25] > 0) {
+        this.kassa[25] -= 1;
+        this.kassa[50] += 1;
+      } else if (money === 50 && !this.kassa[25]) {
+        return 'dont have change';
+      } else if (money === 100 && this.kassa[50] && this.kassa[25]) {
+        this.kassa[50] -= 1;
+        this.kassa[25] -= 1;
+        this.kassa[100] += 1;
+      } else if (money === 100 && this.kassa[25] >= 3) {
+        this.kassa[25] -= 3;
+        this.kassa[100] += 1;
+      } else {
+        return 'dont have change';
+      }
+      return undefined;
+    },
+  };
+
+  for (let i = 0; i < queue.length; i += 1) {
+    if (seller.sell(queue[i]) === 'dont have change') {
+      return false;
+    }
+  }
+  return true;
 }
 
 /**
