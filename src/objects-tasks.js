@@ -416,32 +416,86 @@ function group(array, keySelector, valueSelector) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  result: '',
+  element(value) {
+    const newObj = Object.create(this);
+    if (newObj.element) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+    newObj.element = true;
+    newObj.id = false;
+    newObj.pseudoElement = false;
+    newObj.result = `${value}`;
+    return newObj;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    const newObj = Object.create(this);
+    if (newObj.id) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+    newObj.id = true;
+    newObj.element = false;
+    newObj.pseudoElement = false;
+    newObj.result = `${this.result}#${value}`;
+    return newObj;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    const newObj = Object.create(this);
+    newObj.element = false;
+    newObj.pseudoElement = false;
+    newObj.id = false;
+    newObj.result = `${this.result}.${value}`;
+    return newObj;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    const newObj = Object.create(this);
+    newObj.element = false;
+    newObj.pseudoElement = false;
+    newObj.id = false;
+    newObj.result = `${this.result}[${value}]`;
+    return newObj;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    const newObj = Object.create(this);
+    newObj.element = false;
+    newObj.pseudoElement = false;
+    newObj.id = false;
+    newObj.result = `${this.result}:${value}`;
+    return newObj;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    const newObj = Object.create(this);
+    if (newObj.pseudoElement) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+    newObj.element = false;
+    newObj.pseudoElement = true;
+    newObj.id = false;
+    newObj.result = `${this.result}::${value}`;
+    return newObj;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const newObj = Object.create(this);
+    newObj.result = `${selector1.stringify()} ${combinator} ${selector2.stringify()}`;
+    return newObj;
+  },
+  stringify() {
+    const ress = this.result;
+    // cssSelectorBuilder.result = '';
+    this.result = '';
+    return ress;
   },
 };
 
